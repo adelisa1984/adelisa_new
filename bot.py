@@ -14,8 +14,10 @@ import os
 from IPython.core.display import Image, display
 from vedis import Vedis
 from enum import Enum
-
+from flask import Flask , request
 driver = webdriver.Firefox(executable_path=r'C:\\Users\\victo\\bin\\geckodriver.exe') # set path  to your gekodriver.exe
+
+server = Flask(__name__)
 
 
 token ='1013908134:AAG4nF2iyWx3Jf_rbl5lZD2YN2WlYqV5PGo'
@@ -26,16 +28,16 @@ job = None
 Region = None
 
 
-listr= 'Балашиха, Железнодорожный, Жуковский, Коломна, Королев, Люберцы,\n Мытищи, Ногинск, Одинцово, Орехово-Зуево, ' \
-       'Подольск, Сергиев Посад,\n Серпухов, Химки, Щелково, Электросталь, Зеленоград, Клин,\n Реутов, Павловский Посад, ' \
-       'Солнечногорск, Дмитров, Красногорск, Чехов,\n Лобня, Донской, Наро-Фоминск, Яхрома, Видное, Воскресенск,\n Московский, ' \
-       'Пушкино, Домодедово, Климовск, Фрязино, Апрелевка,\n Егорьевск, Ивантеевка, Протвино, Раменское, Лыткарино, Щербинка,\n ' \
-       'Долгопрудный, Ступино, Бронницы, Электрогорск, Можайск, Дубна,\n Истра, Волоколамск, Дзержинский, Верея, Высоковск,' \
-       ' Голицыно,\n Дедовск, Дрезна, Зарайск, Звенигород, Кашира, Котельники,\n Красноармейск, Краснозаводск, Кубинка, Куровское, ' \
-       'Ликино-Дулево, Лосино-Петровский,\n Луховицы, Ожерелье, Озеры, Пересвет, Пущино, Рошаль,\n Руза, Старая Купавна, Хотьково,' \
-       ' Черноголовка, Шатура, Электроугли,\n Юбилейный, Куринокво, Малино, Софрино, Михнево'
+listr= 'Р‘Р°Р»Р°С€РёС…Р°, Р–РµР»РµР·РЅРѕРґРѕСЂРѕР¶РЅС‹Р№, Р–СѓРєРѕРІСЃРєРёР№, РљРѕР»РѕРјРЅР°, РљРѕСЂРѕР»РµРІ, Р›СЋР±РµСЂС†С‹,\n РњС‹С‚РёС‰Рё, РќРѕРіРёРЅСЃРє, РћРґРёРЅС†РѕРІРѕ, РћСЂРµС…РѕРІРѕ-Р—СѓРµРІРѕ, ' \
+       'РџРѕРґРѕР»СЊСЃРє, РЎРµСЂРіРёРµРІ РџРѕСЃР°Рґ,\n РЎРµСЂРїСѓС…РѕРІ, РҐРёРјРєРё, Р©РµР»РєРѕРІРѕ, Р­Р»РµРєС‚СЂРѕСЃС‚Р°Р»СЊ, Р—РµР»РµРЅРѕРіСЂР°Рґ, РљР»РёРЅ,\n Р РµСѓС‚РѕРІ, РџР°РІР»РѕРІСЃРєРёР№ РџРѕСЃР°Рґ, ' \
+       'РЎРѕР»РЅРµС‡РЅРѕРіРѕСЂСЃРє, Р”РјРёС‚СЂРѕРІ, РљСЂР°СЃРЅРѕРіРѕСЂСЃРє, Р§РµС…РѕРІ,\n Р›РѕР±РЅСЏ, Р”РѕРЅСЃРєРѕР№, РќР°СЂРѕ-Р¤РѕРјРёРЅСЃРє, РЇС…СЂРѕРјР°, Р’РёРґРЅРѕРµ, Р’РѕСЃРєСЂРµСЃРµРЅСЃРє,\n РњРѕСЃРєРѕРІСЃРєРёР№, ' \
+       'РџСѓС€РєРёРЅРѕ, Р”РѕРјРѕРґРµРґРѕРІРѕ, РљР»РёРјРѕРІСЃРє, Р¤СЂСЏР·РёРЅРѕ, РђРїСЂРµР»РµРІРєР°,\n Р•РіРѕСЂСЊРµРІСЃРє, РРІР°РЅС‚РµРµРІРєР°, РџСЂРѕС‚РІРёРЅРѕ, Р Р°РјРµРЅСЃРєРѕРµ, Р›С‹С‚РєР°СЂРёРЅРѕ, Р©РµСЂР±РёРЅРєР°,\n ' \
+       'Р”РѕР»РіРѕРїСЂСѓРґРЅС‹Р№, РЎС‚СѓРїРёРЅРѕ, Р‘СЂРѕРЅРЅРёС†С‹, Р­Р»РµРєС‚СЂРѕРіРѕСЂСЃРє, РњРѕР¶Р°Р№СЃРє, Р”СѓР±РЅР°,\n РСЃС‚СЂР°, Р’РѕР»РѕРєРѕР»Р°РјСЃРє, Р”Р·РµСЂР¶РёРЅСЃРєРёР№, Р’РµСЂРµСЏ, Р’С‹СЃРѕРєРѕРІСЃРє,' \
+       ' Р“РѕР»РёС†С‹РЅРѕ,\n Р”РµРґРѕРІСЃРє, Р”СЂРµР·РЅР°, Р—Р°СЂР°Р№СЃРє, Р—РІРµРЅРёРіРѕСЂРѕРґ, РљР°С€РёСЂР°, РљРѕС‚РµР»СЊРЅРёРєРё,\n РљСЂР°СЃРЅРѕР°СЂРјРµР№СЃРє, РљСЂР°СЃРЅРѕР·Р°РІРѕРґСЃРє, РљСѓР±РёРЅРєР°, РљСѓСЂРѕРІСЃРєРѕРµ, ' \
+       'Р›РёРєРёРЅРѕ-Р”СѓР»РµРІРѕ, Р›РѕСЃРёРЅРѕ-РџРµС‚СЂРѕРІСЃРєРёР№,\n Р›СѓС…РѕРІРёС†С‹, РћР¶РµСЂРµР»СЊРµ, РћР·РµСЂС‹, РџРµСЂРµСЃРІРµС‚, РџСѓС‰РёРЅРѕ, Р РѕС€Р°Р»СЊ,\n Р СѓР·Р°, РЎС‚Р°СЂР°СЏ РљСѓРїР°РІРЅР°, РҐРѕС‚СЊРєРѕРІРѕ,' \
+       ' Р§РµСЂРЅРѕРіРѕР»РѕРІРєР°, РЁР°С‚СѓСЂР°, Р­Р»РµРєС‚СЂРѕСѓРіР»Рё,\n Р®Р±РёР»РµР№РЅС‹Р№, РљСѓСЂРёРЅРѕРєРІРѕ, РњР°Р»РёРЅРѕ, РЎРѕС„СЂРёРЅРѕ, РњРёС…РЅРµРІРѕ'
 
-listj= ['грузчик, продавец, секретарь, директор, аналитик, бухгалтер']
+listj= ['РіСЂСѓР·С‡РёРє, РїСЂРѕРґР°РІРµС†, СЃРµРєСЂРµС‚Р°СЂСЊ, РґРёСЂРµРєС‚РѕСЂ, Р°РЅР°Р»РёС‚РёРє, Р±СѓС…РіР°Р»С‚РµСЂ']
 
 
 
@@ -54,16 +56,16 @@ class States(Enum):
 db = 'base.vdb'
 
 def get_state(user_id):
-    with Vedis(db) as db:
+    with Vedis(db) as db1:
         try:
-            return db[user_id].decode()
+            return db1[user_id].decode()
         except KeyError:
             return States.S_Start.value
 
 def set_state(user_id, value):
-    with Vedis(db) as db:
+    with Vedis(db) as db1:
         try:
-            db[user_id]  = value
+            db1[user_id]  = value
             return True
         except:
             return False
@@ -95,7 +97,6 @@ def info_cmd (message):
                                       'Then select a region or several regions (by region I mean a town or city around Moscow with the outskirts area of about 10 km)'
                                       'I only have information about limited number of regions.\n'
                                       'to view the list of regions /list_sample_regions.\n'
-                                      'If you would like to get the average salary for the region or several regions /get_avg.\n'
                                       '/reset  to start again.\n'
                                       '/info to get this guidelines')
 
@@ -175,7 +176,7 @@ def get_region (message):
 
             paintit().figure.savefig('demo-file.png')
             bot.send_photo(message.chat.id, photo=open('demo-file.png', 'rb'))
-            set_state(message.chat.id, config.States.S_avg_needed.value)
+            set_state(message.chat.id, States.S_avg_needed.value)
             bot.send_message(message.chat.id, 'Now would you like to get Average salary histogram for the region or several regions chosen? enter /yes  or /no' )
 
 @bot.message_handler(func=lambda message: get_state(message.chat.id) == States.S_avg_needed.value
@@ -224,6 +225,18 @@ def cmd_sample_message(message):
                                       '/reset  to start again.\n'
                                       '/info to get this guidelines')
 
+@server.route('/' + token, methods=['POST'])
+def getMessage():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
 
-if __name__ == '__main__':
-    bot.infinity_polling()
+
+@server.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url='https://agile-wildwood-50955.herokuapp.com/' + token)
+    return "!", 200
+
+
+if __name__ == "__main__":
+    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
